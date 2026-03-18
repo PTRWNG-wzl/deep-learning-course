@@ -9,11 +9,18 @@ FIGS_DIR = REPORT_DIR / "figs"
 
 CNN_INTRO = ROOT / "02_CNN_Introduction.ipynb"
 NET_TRAIN = ROOT / "03_Network_Training.ipynb"
+RNN = ROOT / "05_RNN.ipynb"
+YOLO = ROOT / "10_Data_Classification_YOLO.ipynb"
 
 
 def _load_nb(path: Path):
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _cell_source(cell):
+    src = cell.get("source", [])
+    return "".join(src) if isinstance(src, list) else str(src)
 
 
 def _cell_text(cell):
@@ -83,6 +90,10 @@ def export_net_train():
 
 
 def export_arch_sketch():
+    import os
+    os.environ.setdefault("MPLBACKEND", "Agg")
+    import matplotlib
+    matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     plt.figure(figsize=(6, 2.5))
@@ -112,12 +123,74 @@ def export_arch_sketch():
     plt.close()
 
 
+def export_rnn():
+    nb = _load_nb(RNN)
+    task1_img = task2_img = task3_img = None
+
+    for cell in nb.get("cells", []):
+        src = _cell_source(cell)
+        images = _cell_images(cell)
+        if not images:
+            continue
+        if "Coursework summary: Task 1" in src or "window_size sweep" in src:
+            task1_img = images[-1]
+        if "Coursework summary: Task 2" in src or "accuracy curves" in src:
+            task2_img = images[-1]
+        if "Coursework summary: BLEU" in src or "BLEU vs temperature" in src:
+            task3_img = images[-1]
+
+    if task1_img:
+        _write_png(task1_img, FIGS_DIR / "rnn_task1_curves.png")
+        print("  rnn_task1_curves.png")
+    else:
+        print("  [skip] rnn_task1_curves.png (no output in 05_RNN)")
+    if task2_img:
+        _write_png(task2_img, FIGS_DIR / "rnn_task2_curves.png")
+        print("  rnn_task2_curves.png")
+    else:
+        print("  [skip] rnn_task2_curves.png (no output in 05_RNN)")
+    if task3_img:
+        _write_png(task3_img, FIGS_DIR / "rnn_task3_bleu.png")
+        print("  rnn_task3_bleu.png")
+    else:
+        print("  [skip] rnn_task3_bleu.png (no output in 05_RNN)")
+
+
+def export_yolo():
+    nb = _load_nb(YOLO)
+    curves_img = None
+
+    for cell in nb.get("cells", []):
+        src = _cell_source(cell)
+        images = _cell_images(cell)
+        if not images:
+            continue
+        if "Coursework summary" in src and "learning curves" in src:
+            curves_img = images[-1]
+            break
+
+    if curves_img:
+        _write_png(curves_img, FIGS_DIR / "yolo_learning_curves.png")
+        print("  yolo_learning_curves.png")
+    else:
+        print("  [skip] yolo_learning_curves.png (no output in 10_Data_Classification_YOLO)")
+
+
 def main():
+    import os
+    os.environ.setdefault("MPLBACKEND", "Agg")
     FIGS_DIR.mkdir(parents=True, exist_ok=True)
+    print("Exporting 02_CNN_Introduction...")
     export_cnn_intro()
+    print("Exporting 03_Network_Training...")
     export_net_train()
+    print("Exporting 05_RNN...")
+    export_rnn()
+    print("Exporting 10_Data_Classification_YOLO...")
+    export_yolo()
+    print("Exporting cnn_task1_arch (sketch)...")
     export_arch_sketch()
-    print("Exported figures to", FIGS_DIR)
+    print("Done. Figures saved to", FIGS_DIR)
 
 
 if __name__ == "__main__":
