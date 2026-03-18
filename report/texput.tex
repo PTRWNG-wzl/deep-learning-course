@@ -4,7 +4,30 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{float}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{listings}
 \geometry{margin=1in}
+\setlength{\columnsep}{0.25in}
+\setlength{\textfloatsep}{7pt plus 1pt minus 2pt}
+\setlength{\intextsep}{7pt plus 1pt minus 2pt}
+\captionsetup{font=small,labelfont=bf}
+\setlist[itemize]{leftmargin=1.15em,itemsep=2pt,topsep=2pt,parsep=0pt,partopsep=0pt}
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  frame=single,
+  keepspaces=true
+}
 \begin{document}
+\twocolumn[
+\begin{center}
+  {\Large\textbf{pw823, 02228210}}
+\end{center}
+\vspace{0.8em}
+]
 \input{overleaf_report_body}
 \end{document}

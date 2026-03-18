@@ -9,9 +9,10 @@
 \section*{4. Common CNN Architectures}
 
 \subsection*{Task 4.1: Tiny-ImageNet with VGG16}
-\textbf{Report:}
 \begin{itemize}
   \item Fine-tuned VGG16 on Tiny-ImageNet. Best test accuracy reported in Table~\ref{tab:tiny_acc}. Training/validation accuracy curves show convergence.
+  \item Figure~\ref{fig:tiny_vgg_curve} reports the training and validation accuracy curves for the VGG16 run in Task 4.1.
+  \item The final score indicates reasonable transfer from ImageNet pretraining, while still leaving room for gains from longer training and stronger augmentation.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -29,10 +30,17 @@
   \end{tabular}
 \end{table}
 
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.95\columnwidth]{figs/task41_vgg16_curves.png}
+  \caption{Task 4.1 VGG16 training vs.\ validation accuracy on Tiny-ImageNet.}
+  \label{fig:tiny_vgg_curve}
+\end{figure}
+
 \subsection*{Task 4.2: ConvNeXt Model Scaling}
-\textbf{Report:}
 \begin{itemize}
   \item Compared ConvNeXt variants (tiny, small, base) on Tiny-ImageNet. Accuracy and MSE vs.\ number of parameters (Figure~\ref{fig:convnext}).
+\item Scaling increases capacity and generally improves accuracy, but with diminishing returns relative to parameter growth.
 \end{itemize}
 
 \begin{figure}[!ht]
@@ -47,9 +55,9 @@
 \section*{5. RNN}
 
 \subsection*{Task 5.1: RNN Regression}
-\textbf{Report:}
 \begin{itemize}
   \item Window size sweep: RMSE vs.\ window size (Table~\ref{tab:rnn_reg}). Best window size $=1$ for lowest test RMSE. Test curve plot in Figure~\ref{fig:rnn_reg}.
+\item Larger windows overfit temporal context in this setup, increasing test error despite lower training RMSE.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -78,9 +86,9 @@
 \end{figure}
 
 \subsection*{Task 5.2: Text Embeddings}
-\textbf{Report:}
 \begin{itemize}
   \item Compared Embeddings, LSTM, and LSTM+GloVe models. Test accuracy and sentiment scores (Table~\ref{tab:rnn_emb}). Accuracy/loss curves in Appendix.
+\item Pretrained embeddings improve sentiment polarity separation and recover the best overall accuracy.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -101,9 +109,9 @@
 \end{table}
 
 \subsection*{Task 5.3: Text Generation}
-\textbf{Report:}
 \begin{itemize}
   \item BLEU score vs.\ temperature for char-level and word-level models (Table~\ref{tab:rnn_bleu}, Figure~\ref{fig:rnn_bleu}).
+\item Moderate sampling temperature gives the best BLEU balance; very high temperature hurts coherence.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -130,15 +138,14 @@
   \caption{BLEU vs.\ temperature for char-level and word-level generation.}
   \label{fig:rnn_bleu}
 \end{figure}
-\clearpage
 
 % -----------------------------------------------------------------------------
 \section*{6. Autoencoders}
 
 \subsection*{Task 6.1: Representation Learning}
-\textbf{Report:}
 \begin{itemize}
   \item Autoencoder for representation learning. Classifier accuracy and MSE for linear AE, conv AE, and PCA (Table~\ref{tab:ae_rep}).
+\item Learned nonlinear representations slightly outperform PCA in classification, while reconstruction quality remains comparable.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -159,9 +166,9 @@
 \end{table}
 
 \subsection*{Task 6.2: Custom Loss Functions}
-\textbf{Report:}
 \begin{itemize}
   \item Effect of custom loss terms on denoising MSE (Table~\ref{tab:ae_loss}, Figure~\ref{fig:ae_denoise}).
+\item The table compares denoising quality under different objectives using a unified MSE evaluation protocol.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -193,9 +200,9 @@
 \section*{7. VAE GAN}
 
 \subsection*{Task 7.1: MNIST Generation (VAE/GAN)}
-\textbf{Report:}
 \begin{itemize}
   \item VAE: reconstruction MSE and Inception Score. GAN: Inception Score. Table~\ref{tab:vae_gan}.
+\item Removing KL improves reconstruction MSE but harms generative quality (IS), showing the expected trade-off between reconstruction fidelity and latent regularization.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -210,15 +217,15 @@
     \midrule
     VAE (latent=10 + KL) & 10.983575 & 5.342967 \\
     VAE (no KL) & 8.836834 & 2.374818 \\
-    GAN (latent=10) & NaN & 1.000000 \\
+    GAN (latent=10) & N/A & 1.000000 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \subsection*{Task 7.2: MAE vs.\ cGAN Colourisation}
-\textbf{Report:}
 \begin{itemize}
   \item Mean MAE for MAE and cGAN on CIFAR-10 colourisation (Table~\ref{tab:mae_cgan}). Qualitative examples in Appendix.
+\item Pixel-wise MAE is lower for the MAE model, while cGAN may still produce perceptually sharper colours in selected examples.
 \end{itemize}
 
 \begin{table}[!ht]
@@ -242,9 +249,10 @@
 
 \subsection*{Task 8.1: Q-learning}
 
-\textbf{Report:}
 \begin{itemize}
   \item Q-learning (and SARSA) with $\epsilon$-greedy and Softmax policies. Average reward (last 50 episodes) vs.\ training episodes (Figure~\ref{fig:rl_rewards}).
+  \item $\epsilon$-greedy converges faster in this experiment, while Softmax can be smoother but more sensitive to temperature tuning.
+  \item Appendix includes (i) key modifications to \texttt{DQNAgent} for the four agents and (ii) secondary behavioural plots.
 \end{itemize}
 
 \begin{figure}[!ht]
@@ -260,16 +268,15 @@
 
 \subsection*{Task 9.1: Forward Noising}
 
-\textbf{Report:}
 \begin{itemize}
-  \item Forward noising: clean image, noised image, and noise (Figure~\ref{fig:diffusion_noise}). Training loss curve in Appendix.
+  \item Diffusion qualitative result: real and generated MNIST samples (Figure~\ref{fig:diffusion_noise}). Training loss curve and training code are included in Appendix Task 9.2.
+\item Visual inspection confirms that increasing diffusion steps progressively destroys semantic structure while preserving the stochastic forward-process formulation.
 \end{itemize}
 
 \begin{figure}[!ht]
   \centering
-  % Export from 09 notebook: clean, noised, noise
-  \includegraphics[width=0.95\columnwidth]{figs/diffusion_noise_demo.png}
-  \caption{Diffusion forward process: clean image, noised image, and noise.}
+  \includegraphics[width=0.95\columnwidth]{figs/diffusion_train_loss.png}
+  \caption{Diffusion model qualitative output: real vs.\ generated MNIST digits.}
   \label{fig:diffusion_noise}
 \end{figure}
 
@@ -279,12 +286,12 @@
 
 \subsection*{Task 10.1: Roof Classification}
 
-\textbf{Report:}
 \begin{itemize}
   \item Finetuned \texttt{yolov8n-cls.pt} on aerial roof images (flat vs.\ pitched). Dataset: course-provided aerial data merged with Zenodo BRAILS roof-type images.
   \item Data augmentation: RandAugment, CutMix, MixUp, Random Erasing.
   \item Training: epochs=30, batch=64, imgsz=320, patience=10. Best checkpoint at epoch 26.
   \item Test accuracy and learning curves (Figure~\ref{fig:yolo_curves}, Table~\ref{tab:yolo}).
+  \item Top-5 accuracy reaches 100\%, indicating class separability is high even when top-1 mistakes remain.
 \end{itemize}
 
 \begin{figure}[!ht]
@@ -312,26 +319,66 @@
 \end{table}
 
 % -----------------------------------------------------------------------------
+\clearpage
 \appendix
 \section*{Appendix}
 
 \subsection*{Task 5.2: Accuracy and loss curves}
-\begin{figure}[!ht]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\columnwidth]{figs/rnn_task2_curves.png}
-  \caption{Accuracy and loss curves for Embeddings, LSTM, and LSTM+GloVe models.}
+  \includegraphics[width=0.95\columnwidth]{figs/rnn_task2_curves.png}
+  \caption{Task 5.2 training and validation curves for Embeddings, LSTM, and LSTM+GloVe models.}
 \end{figure}
 
-\subsection*{Task 7.2: MAE vs.\ cGAN qualitative examples}
-\begin{figure}[!ht]
+\subsection*{Task 7.2: MAE vs.\ cGAN qualitative comparison}
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\columnwidth]{figs/mae_cgan_qualitative.png}
-  \caption{MAE vs.\ cGAN colourisation on CIFAR-10.}
+  \includegraphics[width=0.95\columnwidth]{figs/mae_cgan_qualitative.png}
+  \caption{Task 7.2 qualitative colourisation examples for MAE and cGAN models.}
 \end{figure}
 
-\subsection*{Task 9.2: Diffusion training loss}
-\begin{figure}[!ht]
+\subsection*{Task 8.1: DQNAgent modifications and secondary plots}
+\textbf{Key modifications to \texttt{DQNAgent}:}
+\begin{itemize}
+  \item Added an \texttt{algorithm} switch (\texttt{q\_learning}/\texttt{sarsa}) to control TD target computation.
+  \item Added a \texttt{policy} switch (\texttt{epsilon\_greedy}/\texttt{softmax}) with temperature-controlled softmax action selection.
+  \item Extended replay memory tuples to include \texttt{next\_action}, enabling on-policy SARSA updates.
+  \item Logged behavioural diagnostics during training: greedy-action fraction, policy entropy, and average TD-error magnitude.
+\end{itemize}
+
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\columnwidth]{figs/diffusion_train_loss.png}
-  \caption{Diffusion model training loss vs.\ epochs.}
+  \includegraphics[width=0.95\columnwidth]{figs/rl_task1_out2.png}
+  \caption{Task 8.1 secondary plot: policy entropy across training for the four agents.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\columnwidth]{figs/rl_task1_out3.png}
+  \caption{Task 8.1 secondary plot: TD error magnitude across training for the four agents.}
+\end{figure}
+
+\subsection*{Task 9.2: Diffusion training code and loss curve}
+\begin{lstlisting}
+# Training loop for the diffusion model
+for epoch in range(num_epochs):
+    model.train()
+    running_loss = 0.0
+    for x, _ in train_loader:
+        x = x.to(DEVICE)
+        t = torch.randint(0, T, (x.size(0),), device=DEVICE).long()
+        x_noisy, noise = add_noise(x, t, sqrt_alphas_cumprod,
+                                   sqrt_one_minus_alphas_cumprod)
+        pred_noise = model(x_noisy, t)
+        loss = F.mse_loss(pred_noise, noise)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item() * x.size(0)
+\end{lstlisting}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\columnwidth]{figs/diffusion_noise_demo.png}
+  \caption{Task 9.2 diffusion training loss across epochs.}
 \end{figure}
