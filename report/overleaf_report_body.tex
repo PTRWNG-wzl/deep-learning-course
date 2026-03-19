@@ -10,46 +10,53 @@
 
 \subsection*{Task 4.1: Tiny-ImageNet with VGG16}
 \begin{itemize}
-  \item Fine-tuned VGG16 on Tiny-ImageNet. Best test accuracy reported in Table~\ref{tab:tiny_acc}. Training/validation accuracy curves show convergence.
-  \item Figure~\ref{fig:tiny_vgg_curve} reports the training and validation accuracy curves for the VGG16 run in Task 4.1.
-  \item The final score indicates reasonable transfer from ImageNet pretraining, while still leaving room for gains from longer training and stronger augmentation.
+  \item Compared four Task 4.1 settings: VGG16 from scratch, VGG16 transfer learning, VGG16 full fine-tuning, and a ResNet18 fine-tuning baseline.
+  \item Figure~\ref{fig:tiny_vgg_curve} shows the training/validation accuracy curves; full VGG16 fine-tuning gives the best validation behaviour.
+  \item Table~\ref{tab:tiny_acc} reports test accuracy together with average epoch time and per-image inference time.
 \end{itemize}
 
 \begin{table}[!ht]
   \centering
-  \small
-  \setlength{\tabcolsep}{4pt}
-  \caption{Tiny-ImageNet: best test accuracy.}
+  \scriptsize
+  \caption{Task 4.1: Tiny-ImageNet results for VGG16 and ResNet18 baselines.}
   \label{tab:tiny_acc}
-  \begin{tabular}{lc}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lrrr}
     \toprule
-    Metric & Value \\
+    Model & Test Acc (\%) & Epoch Time (s) & Infer Time (s) \\
     \midrule
-    Test Accuracy (\%) & 38.27 \\
+    VGG16 scratch           & 0.50  & 25.09 & 0.000012 \\
+    VGG16 transfer learning & 14.61 & 20.00 & 0.000012 \\
+    VGG16 fine-tuning       & 55.55 & 24.79 & 0.000013 \\
+    ResNet18 fine-tuning    & 40.84 & 9.96  & 0.000022 \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
 
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.95\columnwidth]{figs/task41_vgg16_curves.png}
-  \caption{Task 4.1 VGG16 training vs.\ validation accuracy on Tiny-ImageNet.}
+  \caption{Task 4.1: VGG16 training vs.\ validation accuracy on Tiny-ImageNet.}
   \label{fig:tiny_vgg_curve}
 \end{figure}
 
+From an optimisation perspective, the comparison illustrates the value of pretrained representations on medium-scale datasets. Randomly initialised VGG16 struggles to learn robust features under the same budget, while transfer/fine-tuning starts from semantically meaningful filters and converges faster to stronger minima. The additional time columns also make clear that better accuracy can require significantly higher training cost.
+
 \subsection*{Task 4.2: ConvNeXt Model Scaling}
 \begin{itemize}
-  \item Compared ConvNeXt variants (tiny, small, base) on Tiny-ImageNet. Accuracy and MSE vs.\ number of parameters (Figure~\ref{fig:convnext}).
-\item Scaling increases capacity and generally improves accuracy, but with diminishing returns relative to parameter growth.
+  \item ConvNeXt scaling shows accuracy increasing from \(\sim 83.2\%\) (Tiny, \(\sim 28\)M parameters) to \(\sim 87.1\%\) (Large, \(\sim 198\)M parameters), while test cross-entropy decreases from \(\sim 0.65\) to \(\sim 0.49\) (Figure~\ref{fig:convnext}).
+  \item This confirms the expected capacity-performance trade-off: larger backbones improve quality but with higher computational cost.
 \end{itemize}
 
 \begin{figure}[!ht]
   \centering
-  % Export from 04 notebook: plot accuracy/MSE vs params for ConvNeXt-Tiny/Small/Base
   \includegraphics[width=0.9\columnwidth]{figs/convnext_scaling.png}
-  \caption{ConvNeXt scaling: accuracy and MSE vs.\ number of parameters.}
+  \caption{Task 4.2: ConvNeXt scaling endpoints (Tiny vs.\ Large): test accuracy increases while test cross-entropy decreases as parameter count grows.}
   \label{fig:convnext}
 \end{figure}
+
+Although the larger model performs better, the improvement per additional parameter becomes smaller as scale grows. This is consistent with diminishing returns in transfer learning when only a linear head is updated. In practical terms, Tiny/Small are attractive for constrained hardware, while Base/Large are preferable when maximizing top-end accuracy is the main goal.
 
 % -----------------------------------------------------------------------------
 \section*{5. RNN}
@@ -64,7 +71,7 @@
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{RMSE vs.\ window size for LSTM regression.}
+  \caption{Task 5.1: RMSE vs.\ window size for LSTM regression.}
   \label{tab:rnn_reg}
   \begin{tabular}{ccc}
     \toprule
@@ -78,10 +85,12 @@
   \end{tabular}
 \end{table}
 
+The sentiment-score columns help interpret model behaviour beyond accuracy alone. The embeddings baseline remains almost neutral on both example reviews, while the GloVe-based model shows stronger polarity separation. This suggests that pretrained semantic structure helps resolve sentiment cues that are hard to learn from limited supervision.
+
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.9\columnwidth]{figs/rnn_task1_curves.png}
-  \caption{Test curves for different window sizes (Task 5.1).}
+  \caption{Task 5.1: Test curves for different window sizes.}
   \label{fig:rnn_reg}
 \end{figure}
 
@@ -95,7 +104,7 @@
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{Text embedding models: test accuracy and sentiment scores.}
+  \caption{Task 5.2: Text embedding models test accuracy and sentiment scores.}
   \label{tab:rnn_emb}
   \begin{tabular}{lccc}
     \toprule
@@ -118,7 +127,7 @@
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{BLEU score vs.\ temperature.}
+  \caption{Task 5.3: BLEU score vs.\ temperature.}
   \label{tab:rnn_bleu}
   \begin{tabular}{ccc}
     \toprule
@@ -135,9 +144,11 @@
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.9\columnwidth]{figs/rnn_task3_bleu.png}
-  \caption{BLEU vs.\ temperature for char-level and word-level generation.}
+  \caption{Task 5.3: BLEU vs.\ temperature for char-level and word-level generation.}
   \label{fig:rnn_bleu}
 \end{figure}
+
+Temperature controls the diversity--fidelity trade-off in generation. Lower values keep outputs conservative and more deterministic, while higher values increase variation but can harm grammatical consistency. The observed BLEU trend indicates that moderate sampling provides the best balance for this dataset size and model capacity.
 
 % -----------------------------------------------------------------------------
 \section*{6. Autoencoders}
@@ -145,54 +156,58 @@
 \subsection*{Task 6.1: Representation Learning}
 \begin{itemize}
   \item Autoencoder for representation learning. Classifier accuracy and MSE for linear AE, conv AE, and PCA (Table~\ref{tab:ae_rep}).
-\item Learned nonlinear representations slightly outperform PCA in classification, while reconstruction quality remains comparable.
+  \item Both non-convolutional and convolutional autoencoders clearly outperform PCA in validation accuracy and reconstruction quality.
 \end{itemize}
 
 \begin{table}[!ht]
   \centering
-  \small
-  \setlength{\tabcolsep}{4pt}
-  \caption{Representation learning: classifier accuracy and MSE.}
+  \scriptsize
+  \caption{Task 6.1: Representation learning results (train/validation accuracy and reconstruction MSE).}
   \label{tab:ae_rep}
-  \begin{tabular}{lcc}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lrrrr}
     \toprule
-    Model & Val Acc (\%) & MSE \\
+    Model & Train Acc (\%) & Val Acc (\%) & Train MSE & Val MSE \\
     \midrule
-    Linear AE & 81.30 & 0.026 \\
-    Conv AE & 81.69 & 0.029 \\
-    PCA (10 comp) & 81.38 & 0.0256 \\
+    Non-conv AE  & 93.19 & 93.10 & 0.006321 & 0.007299 \\
+    Conv AE      & 96.17 & 95.91 & 0.005111 & 0.006207 \\
+    PCA (10 comp)& 80.99 & 81.41 & 0.025800 & 0.025600 \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
 
 \subsection*{Task 6.2: Custom Loss Functions}
 \begin{itemize}
   \item Effect of custom loss terms on denoising MSE (Table~\ref{tab:ae_loss}, Figure~\ref{fig:ae_denoise}).
-\item The table compares denoising quality under different objectives using a unified MSE evaluation protocol.
+  \item MSE is best under MSE evaluation, followed by MAE, MSE+SSIM, and SSIM.
 \end{itemize}
 
 \begin{table}[!ht]
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{Denoising MSE for different loss functions.}
+  \caption{Task 6.2: Denoising MSE for different loss functions.}
   \label{tab:ae_loss}
   \begin{tabular}{lc}
     \toprule
     Loss & Test MSE \\
     \midrule
-    MSE & -- \\
-    MAE & -- \\
-    SSIM & -- \\
+    MSE & 0.004602 \\
+    MAE & 0.004648 \\
+    SSIM & 0.004860 \\
+    MSE + SSIM & 0.004731 \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+The small gap between MAE and MSE indicates that both losses are well aligned with pixel-level denoising quality under this evaluation protocol. SSIM-based training prioritises structural similarity and can improve perceived sharpness, but this does not necessarily translate into lower MSE. This explains the ordering in Table~\ref{tab:ae_loss}.
 
 \begin{figure}[!ht]
   \centering
   % Export denoised image examples from 06 notebook
   \includegraphics[width=0.85\columnwidth]{figs/ae_denoise_examples.png}
-  \caption{Denoised image examples for different loss functions.}
+  \caption{Task 6.2: Denoised image examples for different loss functions.}
   \label{fig:ae_denoise}
 \end{figure}
 
@@ -209,7 +224,7 @@
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{VAE vs.\ GAN: MSE and Inception Score on MNIST.}
+  \caption{Task 7.1: VAE vs.\ GAN (MSE and Inception Score on MNIST).}
   \label{tab:vae_gan}
   \begin{tabular}{lcc}
     \toprule
@@ -222,6 +237,8 @@
   \end{tabular}
 \end{table}
 
+The VAE results highlight a clear objective trade-off. Removing KL regularisation improves reconstruction fidelity but weakens sample quality, because the latent space is no longer constrained to match a smooth prior. The KL-regularised variant therefore remains preferable for generation-oriented use cases.
+
 \subsection*{Task 7.2: MAE vs.\ cGAN Colourisation}
 \begin{itemize}
   \item Mean MAE for MAE and cGAN on CIFAR-10 colourisation (Table~\ref{tab:mae_cgan}). Qualitative examples in Appendix.
@@ -232,7 +249,7 @@
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{MAE vs.\ cGAN: mean MAE on CIFAR-10 colourisation.}
+  \caption{Task 7.2: MAE vs.\ cGAN mean MAE on CIFAR-10 colourisation.}
   \label{tab:mae_cgan}
   \begin{tabular}{lc}
     \toprule
@@ -243,6 +260,8 @@
     \bottomrule
   \end{tabular}
 \end{table}
+
+This quantitative trend matches the visual behaviour discussed in the appendix examples. MAE optimisation tends to average colour hypotheses and produces lower pixel error, while adversarial training can produce sharper local textures at the cost of occasional instability. Hence, metric preference depends on whether the target is numerical fidelity or perceptual realism.
 
 % -----------------------------------------------------------------------------
 \section*{8. RL}
@@ -259,26 +278,33 @@
   \centering
   % Export from 08 notebook: reward vs episode for Q-learning agents
   \includegraphics[width=0.9\columnwidth]{figs/rl_reward_curves.png}
-  \caption{Q-learning: average reward (last 50 episodes) vs.\ training episodes.}
+  \caption{Task 8.1: Average reward (last 50 episodes) vs.\ training episodes for Q-learning and SARSA variants.}
   \label{fig:rl_rewards}
 \end{figure}
+
+Across 200 episodes, off-policy Q-learning reaches higher reward faster than SARSA in this setup. The policy choice mainly changes exploration behaviour: $\epsilon$-greedy converges toward deterministic control, while softmax keeps broader action distributions for longer. This stabilitiy--speed trade-off is further illustrated by the appendix secondary plots.
+From a methodological standpoint, this comparison also shows that algorithm-policy pairing matters more than any single hyperparameter in short-horizon training. Off-policy bootstrapping allows Q-learning to reuse value information more aggressively, which can be advantageous when episode budgets are limited. By contrast, SARSA remains more conservative because its target follows the current behaviour policy, making it less optimistic but also slower to exploit promising trajectories early in training.
 
 % -----------------------------------------------------------------------------
 \section*{9. Diffusion Model}
 
 \subsection*{Task 9.1: Forward Noising}
 
-\begin{itemize}
-  \item Diffusion qualitative result: real and generated MNIST samples (Figure~\ref{fig:diffusion_noise}). Training loss curve and training code are included in Appendix Task 9.2.
-\item Visual inspection confirms that increasing diffusion steps progressively destroys semantic structure while preserving the stochastic forward-process formulation.
-\end{itemize}
+The forward diffusion process is implemented using the DDPM closed-form equation
+\[
+x_t=\sqrt{\bar{\alpha}_t}\,x_0+\sqrt{1-\bar{\alpha}_t}\,\epsilon .
+\]
+In batched computation, timesteps are sampled per image and schedule terms are reshaped to \((B,1,1,1)\) for correct broadcasting.
+Figure~\ref{fig:diffusion_noise} shows the expected behaviour across timesteps: at early steps (\(t=0,50\)) the digit remains mostly intact, at intermediate steps (\(t=150,300\)) structure degrades significantly, and at large steps (\(t=900,999\)) the image approaches near-pure noise.
 
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.95\columnwidth]{figs/diffusion_train_loss.png}
-  \caption{Diffusion model qualitative output: real vs.\ generated MNIST digits.}
+  \caption{Task 9.1: Forward diffusion examples (clean image, noised image, and sampled noise) across timesteps.}
   \label{fig:diffusion_noise}
 \end{figure}
+
+This progression is important for the reverse denoising objective: if the forward schedule degrades information smoothly rather than abruptly, the model can learn a sequence of local denoising steps that is easier to optimise than direct one-shot reconstruction from heavy corruption. The visual trajectory in Figure~\ref{fig:diffusion_noise} is therefore consistent with a well-conditioned diffusion process.
 
 % -----------------------------------------------------------------------------
 \section*{10. Data Classification YOLO}
@@ -291,13 +317,13 @@
   \item Data augmentation: RandAugment, CutMix, MixUp, Random Erasing.
   \item Training: epochs=30, batch=64, imgsz=320, patience=10. Best checkpoint at epoch 26.
   \item Test accuracy and learning curves (Figure~\ref{fig:yolo_curves}, Table~\ref{tab:yolo}).
-  \item Top-5 accuracy reaches 100\%, indicating class separability is high even when top-1 mistakes remain.
+  \item Top-5 accuracy reaches 100\%, which is expected here because this is a 2-class problem (flat vs.\ pitched): when \(k=5 \ge C=2\), the true class is always inside the top-5 set. Therefore, Top-1 is the more informative metric in this task.
 \end{itemize}
 
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.96\columnwidth]{figs/yolo_learning_curves.png}
-  \caption{YOLOv8 roof classification: training loss and accuracy curves.}
+  \caption{Task 10.1: YOLOv8 roof classification training loss and accuracy curves.}
   \label{fig:yolo_curves}
 \end{figure}
 
@@ -305,7 +331,7 @@
   \centering
   \small
   \setlength{\tabcolsep}{4pt}
-  \caption{YOLOv8 roof classification: test metrics.}
+  \caption{Task 10.1: YOLOv8 roof classification test metrics.}
   \label{tab:yolo}
   \begin{tabular}{lc}
     \toprule
@@ -317,6 +343,9 @@
     \bottomrule
   \end{tabular}
 \end{table}
+
+The learning curves indicate stable optimisation with improving validation accuracy over training. Given the binary label space, Top-1 is the primary metric for model comparison, while Top-5 is retained for completeness and follows directly from the class-count constraint. Overall, the reported metrics suggest that the model and augmentation setup generalise reasonably well to held-out samples.
+For deployment-oriented interpretation, the most relevant question is whether false positives and false negatives are balanced across the two roof categories. In practical downstream use, threshold calibration and class-wise error analysis are often as important as aggregate accuracy, especially when class distributions shift across geographic regions. This motivates reporting confusion-matrix-style diagnostics in future iterations, even when headline Top-1 performance is already strong.
 
 % -----------------------------------------------------------------------------
 \clearpage
